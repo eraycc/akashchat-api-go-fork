@@ -10,7 +10,7 @@
 ## 功能特性
 
 - **统一 API 接口**: 兼容 OpenAI ChatGPT API 格式
-- **文本生成**: 支持多种文本生成模型
+- **文本生成**: 支持多种文本生成模型，并支持流式响应
 - **图像生成**: 支持 AkashGen 图像生成模型
 - **会话管理**: 自动会话令牌缓存和刷新
 - **错误处理**: 全面的错误处理和验证
@@ -81,13 +81,24 @@ curl -X POST http://localhost:16571/v1/chat/completions \
 **响应:**
 ```json
 {
-  "code": 200,
-  "data": {
-    "model": "Meta-Llama-3-3-70B-Instruct",
-    "messageId": "msg-orzxMXJQe8P5nt5CfRPnG46u",
-    "all_content": "你好！我很好，谢谢你的询问...",
-    "thinking_content": "<think>用户在问候我...</think>",
-    "pure_content": "你好！我很好，谢谢你的询问..."
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "你好！我很好，谢谢你的询问...",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1755506652,
+  "id": "chatcmpl-1755506652.79333",
+  "model": "Meta-Llama-3-3-70B-Instruct",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 0,
+    "prompt_tokens": 0,
+    "total_tokens": 0
   }
 }
 ```
@@ -205,6 +216,7 @@ akashchat-api-go/
 | `model` | 字符串 | 是 | - | 模型名称（例如："Meta-Llama-3-3-70B-Instruct"、"AkashGen"） |
 | `temperature` | 浮点数 | 否 | 0.85 | 采样温度（0.0-2.0） |
 | `topP` | 浮点数 | 否 | 1.0 | Top-p 采样参数 |
+| `stream` | 布尔值 | 否 | false | 是否启用流式响应 |
 
 ### 消息对象
 

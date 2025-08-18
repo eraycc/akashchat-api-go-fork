@@ -92,25 +92,39 @@ func (h *ChatHandler) ChatCompletions(c *gin.Context) {
 		}
 
 		// Handle text generation
-		data, err := h.akashService.ProcessTextGeneration(req, sessionToken, temperature, topP)
-		if err != nil {
-			if err.Error() == "invalid model" {
+		if req.Stream != nil && *req.Stream && req.Model != "AkashGen" {
+			// Handle streaming
+			c.Writer.Header().Set("Content-Type", "text/event-stream")
+			c.Writer.Header().Set("Cache-Control", "no-cache")
+			c.Writer.Header().Set("Connection", "keep-alive")
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+
+			err := h.akashService.ProcessTextGenerationStream(req, sessionToken, temperature, topP, c.Writer)
+			if err != nil {
+				// Since headers are already sent, we can't send a JSON error.
+				// Log the error and close the connection.
+				// A more robust solution might involve sending a specific error event in the stream.
+				c.AbortWithError(http.StatusInternalServerError, err)
+				return
+			}
+		} else {
+			// Handle non-streaming
+			data, err := h.akashService.ProcessTextGeneration(req, sessionToken, temperature, topP)
+			if err != nil {
+				if err.Error() == "invalid model" {
+					c.JSON(http.StatusInternalServerError, model.APIResponse{
+						Code: 500,
+						Data: model.ErrorData{Message: "Error Model."},
+					})
+					return
+				}
 				c.JSON(http.StatusInternalServerError, model.APIResponse{
 					Code: 500,
-					Data: model.ErrorData{Message: "Error Model."},
+					Data: model.ErrorData{Message: "Text generation failed: " + err.Error()},
 				})
 				return
 			}
-			c.JSON(http.StatusInternalServerError, model.APIResponse{
-				Code: 500,
-				Data: model.ErrorData{Message: "Text generation failed: " + err.Error()},
-			})
-			return
+			c.JSON(http.StatusOK, data)
 		}
-
-		c.JSON(http.StatusOK, model.APIResponse{
-			Code: 200,
-			Data: data,
-		})
 	}
 }

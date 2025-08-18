@@ -10,7 +10,7 @@ A Go-based REST API service that provides a proxy interface to Akash Chat API, s
 ## Features
 
 - **Unified API Interface**: Compatible with OpenAI ChatGPT API format
-- **Text Generation**: Support for various text generation models
+- **Text Generation**: Support for various text generation models, including streaming support.
 - **Image Generation**: Support for AkashGen image generation model
 - **Session Management**: Automatic session token caching and refresh
 - **Error Handling**: Comprehensive error handling and validation
@@ -81,13 +81,24 @@ curl -X POST http://localhost:16571/v1/chat/completions \
 **Response:**
 ```json
 {
-  "code": 200,
-  "data": {
-    "model": "Meta-Llama-3-3-70B-Instruct",
-    "messageId": "msg-orzxMXJQe8P5nt5CfRPnG46u",
-    "all_content": "Hello! I'm doing well, thank you for asking...",
-    "thinking_content": "<think>The user is greeting me...</think>",
-    "pure_content": "Hello! I'm doing well, thank you for asking..."
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Hello! I'm doing well, thank you for asking...",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1755506652,
+  "id": "chatcmpl-1755506652.79333",
+  "model": "Meta-Llama-3-3-70B-Instruct",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 0,
+    "prompt_tokens": 0,
+    "total_tokens": 0
   }
 }
 ```
@@ -205,6 +216,7 @@ akashchat-api-go/
 | `model` | String | Yes | - | Model name (e.g., "Meta-Llama-3-3-70B-Instruct", "AkashGen") |
 | `temperature` | Float | No | 0.85 | Sampling temperature (0.0-2.0) |
 | `topP` | Float | No | 1.0 | Top-p sampling parameter |
+| `stream` | Boolean | No | false | Enable streaming response |
 
 ### Message Object
 

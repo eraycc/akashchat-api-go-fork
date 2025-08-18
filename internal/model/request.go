@@ -12,6 +12,7 @@ type ChatCompletionRequest struct {
 	Model       string        `json:"model" binding:"required"`
 	Temperature *float64      `json:"temperature,omitempty"`
 	TopP        *float64      `json:"topP,omitempty"`
+	Stream      *bool         `json:"stream,omitempty"`
 }
 
 // AkashChatRequest represents the request to Akash API
