@@ -27,6 +27,7 @@ func (h *ModelHandler) GetModels(c *gin.Context) {
 	}
 
 	req.Header.Set("Referer", "https://chat.akash.network/")
+	req.Header.Set("Accept", "*/*")
 
 	resp, err := client.Do(req)
 	if err != nil {
